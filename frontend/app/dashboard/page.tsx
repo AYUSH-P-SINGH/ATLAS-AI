@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
-  const [mockRepos, setMockRepos] = useState([
+  const [mockRepos] = useState([
     {
       id: "1",
       name: "atlas-ai",

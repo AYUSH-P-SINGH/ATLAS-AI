@@ -23,8 +23,9 @@ export default function LoginPage() {
 
     try {
       await login(formData.usernameOrEmail, formData.password);
-    } catch (err: any) {
-      setErrorMsg(err.message || "Sign in failed. Check your credentials.");
+    } catch (err) {
+      const error = err as Error;
+      setErrorMsg(error.message || "Sign in failed. Check your credentials.");
     }
   };
 

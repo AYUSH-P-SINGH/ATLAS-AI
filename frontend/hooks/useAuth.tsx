@@ -45,7 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    fetchProfile();
+    Promise.resolve().then(() => {
+      fetchProfile();
+    });
   }, []);
 
   // Redirect client if accessing dashboard without session
