@@ -1,21 +1,20 @@
+
+
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
-from jose import jwt  # Wait! PyJWT was installed, not jose! Let's check which JWT was installed.
-# Ah, pyproject.toml has pyjwt. PyJWT is imported as: import jwt.
-# Let's use jwt (PyJWT) which is import jwt, and has jwt.encode, jwt.decode.
 import jwt
-from passlib.context import CryptContext
+import bcrypt
 from loguru import logger
 from app.core.config import settings
-
-# Setup password crypt context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verifies a plain text password against a stored hash."""
     try:
-        return pwd_context.verify(plain_password, hashed_password)
+        return bcrypt.checkpw(
+            plain_password.encode("utf-8"),
+            hashed_password.encode("utf-8")
+        )
     except Exception as e:
         logger.error(f"Password verification error: {e}")
         return False
@@ -23,7 +22,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Generates a secure password hash from a plain text password."""
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode("utf-8")
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(pwd_bytes, salt)
+    return hashed.decode("utf-8")
 
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:

@@ -8,6 +8,7 @@ dependencies = [
     "alembic>=1.18.5",
     "asyncpg>=0.31.0",
     "bcrypt>=5.0.0",
+    "email-validator>=2.3.0",
     "fastapi>=0.139.0",
     "loguru>=0.7.3",
     "passlib[bcrypt]>=1.7.4",
@@ -21,6 +22,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "aiosqlite>=0.22.1",
     "black>=26.5.1",
     "httpx>=0.28.1",
     "isort>=8.0.1",
@@ -29,3 +31,8 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "ruff>=0.15.21",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = "."
+
