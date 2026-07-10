@@ -1,0 +1,156 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+
+export default function RegisterPage() {
+  const { register, loading } = useAuth();
+  const [formData, setFormData] = useState({ email: "", username: "", password: "", confirmPassword: "" });
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrorMsg(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email || !formData.username || !formData.password || !formData.confirmPassword) {
+      setErrorMsg("Please complete all input fields.");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrorMsg("Passwords do not match.");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setErrorMsg("Password must be at least 8 characters long.");
+      return;
+    }
+
+    try {
+      await register(formData.email, formData.username, formData.password);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Registration failed. Please try again.");
+    }
+  };
+
+  return (
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
+      {/* Background radial highlight */}
+      <div className="absolute h-[550px] w-[550px] rounded-full bg-cyan-500/5 blur-[120px] pointer-events-none" />
+
+      <div className="w-full max-w-md space-y-8 z-10">
+        <div className="text-center">
+          <Link href="/" className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 font-extrabold text-white text-xl shadow-xl hover:scale-105 transition-transform duration-200">
+            A
+          </Link>
+          <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-white">
+            Create your Atlas AI account
+          </h2>
+          <p className="mt-2 text-sm text-slate-400">
+            Already have an account?{" "}
+            <Link href="/login" className="font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+              Sign in instead
+            </Link>
+          </p>
+        </div>
+
+        <div className="rounded-2xl glass-panel p-8 shadow-2xl">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            {errorMsg && (
+              <div className="rounded-lg bg-red-950/50 border border-red-500/30 p-4 text-sm text-red-400 animate-pulse-slow">
+                <span className="font-semibold">Error:</span> {errorMsg}
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-300">
+                Email Address
+              </label>
+              <div className="mt-1.5">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  className="block w-full rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-white placeholder-slate-500 shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-slate-300">
+                Username
+              </label>
+              <div className="mt-1.5">
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  value={formData.username}
+                  onChange={handleChange}
+                  placeholder="developer_name"
+                  className="block w-full rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-white placeholder-slate-500 shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                Password
+              </label>
+              <div className="mt-1.5">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="block w-full rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-white placeholder-slate-500 shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-300">
+                Confirm Password
+              </label>
+              <div className="mt-1.5">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="block w-full rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-white placeholder-slate-500 shadow-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 focus:outline-none transition-all text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full justify-center rounded-xl btn-primary py-3.5 text-sm font-bold text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-50 transition-all cursor-pointer"
+              >
+                {loading ? "Registering..." : "Register"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
