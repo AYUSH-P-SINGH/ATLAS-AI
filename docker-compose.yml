@@ -1,0 +1,78 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: atlas-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: atlas_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - atlas-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: atlas-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - atlas-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: atlas-backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:password@postgres:5432/atlas_db
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET=super_secret_jwt_key_for_local_development_change_in_production
+      - LOG_LEVEL=info
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - atlas-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: atlas-frontend
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    networks:
+      - atlas-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  atlas-network:
+    driver: bridge
