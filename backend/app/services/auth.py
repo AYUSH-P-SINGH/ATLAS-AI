@@ -3,9 +3,6 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
-import jwt
-
-from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import verify_password, get_password_hash, decode_access_token
 from app.models.user import User

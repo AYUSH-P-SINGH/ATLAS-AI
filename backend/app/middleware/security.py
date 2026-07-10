@@ -5,7 +5,7 @@ import time
 
 # Very basic in-memory rate limiter placeholder
 # Tracks IP hits per minute
-_rate_limit_db = {}
+_rate_limit_db: dict[str, int] = {}
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
